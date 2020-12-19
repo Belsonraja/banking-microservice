@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: transaction-service
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+  h2:
+    console:
+      enabled: true
+      settings:        web-allow-others: true
+  zipkin:
+    enabled: true
+    service.name: transaction-service
+    sender.type: web
+    base-url: http://localhost:9411
+  sleuth:
+    enabled: true
+    sampler:
+      probability: 1.0
+      
+server:
+  port: 8082
+
+swagger:
+  base-package: com.oracle.payments.transaction
+  title: Transaction Service
+  version: 1.0
+  licence: (C) Copyright Oracle corp
+  description: Transaction Service Application APIs. These APIs are used to manage transaction.
+  
+eureka:
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      default-zone: http://${registry.host:localhost}:${registry.port:8761}/eureka/
+    healthcheck:
+     enabled: false
+      
+logging:
+  level:
+    root: INFO    
+jwt:
+  secret-key: secret
+  
+url:
+  accounts-service:
+    check-account: http://localhost:8080/accounts/checkAccount
+    validate-account: http://localhost:8080/accounts/validateAccount
+    get-balance: http://localhost:8080/accounts/checkAccountBalance
