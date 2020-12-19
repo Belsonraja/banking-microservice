@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: accounts-service
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+  h2:
+    console:
+      enabled: true
+      settings:
+        web-allow-others: true
+  zipkin:
+    enabled: true
+    service.name: accounts-service
+    sender.type: web
+    base-url: http://localhost:9411
+  sleuth:
+    enabled: true
+    sampler:
+      probability: 1.0
+
+server:
+  port: 8080
+  
+swagger:
+  base-package: com.oracle.payments.accounts
+  title: Accounts Service
+  version: 1.0
+  licence: (C) Copyright Oracle corp
+  description: Accounts Service Application APIs. These APIs are used to manage accounts.
+  
+eureka:
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      default-zone: http://${registry.host:localhost}:${registry.port:8761}/eureka/
+    healthcheck:
+      enabled: false
+  

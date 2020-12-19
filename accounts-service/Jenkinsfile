@@ -1,0 +1,61 @@
+pipeline {
+  agent any;
+  options { timeout (time: 50, unit: 'MINUTES') }
+  stages {
+    stage("Maven Build") {
+       steps {
+          sh "mvn -B --setting settings.xml -Drepo.username="user" -Drepo.password="password" -DaltDeploymentRepository=central::default::https://<repo_url> clean deploy"
+       }
+   }
+   stage("Sonar Analysis") {
+       steps {
+       
+       }
+   }
+   stage("Build Container Image") {
+       steps {
+       
+       }
+   }
+   stage("Build Openshift deployment Image") {
+       steps {
+       	
+       }
+   }
+   stage("publish to uDeploy") {
+       steps {
+       	
+       }
+   }
+   stage("Deploy to DEV") {
+       steps {
+       	
+       }
+   }
+   stage("Deploy to SIT") {
+       steps {
+       	
+       }
+   }
+   stage("Automation Tests") {
+       steps {
+       	
+       }
+   }
+   stage("Deploy to UAT") {
+       steps {
+       	
+       }
+   }
+   stage("Deploy to PROD") {
+       steps {
+       	
+       }
+   }
+   stage("Deploy to COB") {
+       steps {
+       	
+       }
+   }
+ }
+}
