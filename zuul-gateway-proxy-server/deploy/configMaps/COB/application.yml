@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: gateway-proxy
+
+server:
+  port: 8762
+   
+eureka:
+  client:
+    service-url:
+      default-one: http://localhost:8761/eureka/
+    healthcheck:
+      enabled: false
+    fetch-registry: true
+    register-with-eureka: false
+#zuul:
+  #routes:
+   #accounts-service: 
+      #service-id: accounts-service
+      #path: /accounts/**
+    #transaction-service: 
+      #service-id: transaction-service
+      #path: /transaction/**

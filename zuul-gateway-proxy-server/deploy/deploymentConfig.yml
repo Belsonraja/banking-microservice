@@ -1,0 +1,132 @@
+kind: Template
+apiVersion: v1
+metadata: 
+  annotations: 
+    version: 0.0.2
+    description: Deployment template for web application
+  name: web-app
+labels: 
+  template: web-basic
+  template.version: 0.0.2
+message: A new application created
+parameters: 
+- description: Name of the application
+  displayName: Application Name
+  name: APP_NAME
+  required: true
+- description: Image of the application
+  displayName: Image Name
+  name: IMAGE_NAME
+  required: true
+- description: Version of the application to deploy
+  displayName: Application version
+  name: APP_VERSION
+  required: true
+- description: Deployment Environment
+  displayName: Environment
+  name: ENV
+  required: true
+- description: Dcoker Registry detail
+  displayName: Dcoker Registry
+  name: DOCKER_REGISTRY
+  value: oracle-prod.artifactrepo.oracle.com
+  required: true
+objects: 
+- kind: Service
+  apiVersion: v1
+  spec:
+    ports:
+    - port: 8080
+      targetPort: 8080
+    selector: 
+      deploymentConfig: accounts-service-dc
+  metadata: 
+    name: ${APP_NAME}
+    labels:
+      app: ${APP_NAME}
+    annotations:
+      description: Application name
+- kind: Service
+  apiVersion: v1
+  spec:
+    ports:
+    - port: 9092
+      targetPort: 9092
+    selector: 
+      deploymentConfig: accounts-service-dc
+  metadata: 
+    name: ${APP_NAME}-h2db
+    labels:
+      app: ${APP_NAME}
+    annotations:
+      description: H2 database connection
+- kind: Route
+  apiVersion: v1
+  id: "${APP_NAME}-http"
+  metadata: 
+    name: "${APP_NAME}"
+    labels:
+      app: "${APP_NAME}"
+    annotations:
+      description: Route for application http service
+  spec:
+    host: accounts-service.cluster1.com
+    to:
+      name: "${APP_NAME}"
+    selector: 
+      deploymentConfig: accounts-service-dc   
+- kind: DeploymentConfig
+  apiVersion: v1
+  id: "${APP_NAME}"
+  spec:
+    strategy: 
+      rolling-params: 
+        updateperiodseconds: 1
+        intervalseconds: 1
+        timeoutseconds: 
+        maxSurge: "25%"
+        maxUnavailable: "25%"
+      type: rolling
+    replicas: 1
+    selector:
+       deploymentConfig: "${APP_NAME}"
+    template:
+       metadata: 
+         name: "${APP_NAME}"
+         labels: 
+           deploymentConfig: "${APP_NAME}"
+           app: "${APP_NAME}"
+       spec:
+         terminationGracePeriodSeconds: 75
+         containers: 
+          - name: "${APP_NAME}"
+            image: /"${DOCKER_REGISTRY}"/"${DOCKER_NAMESPACE}"/"${IMAGE_NAME}":"${VERSION}"/
+            imagePullPolicy: Always
+            env:
+             - name: ENV
+               value: "${ENV}"
+            livenessProbe: 
+              failureThreshold: 10
+              httpGet: 
+                path: /health
+                port: 8080
+                scheme: http
+              periodSeconds: 10
+              successThreshold: 1
+              timeoutSecond: 1
+            redinessProbe: 
+              failureThreshold: 10
+              httpGet: 
+                path: /health
+                port: 8080
+                scheme: http
+              periodSeconds: 10
+              successThreshold: 1
+              timeoutSecond: 1
+            resource:
+              limits: 
+                memory: 1Gi
+            ports:
+              - name: http
+                containerPort: 8080
+                protocol: TCP     
